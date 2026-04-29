@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow">
+<meta name="googlebot" content="noindex, nofollow">
+<title>ワンナイト人狼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Zen+Old+Mincho:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --font-jp: "Zen Old Mincho", "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    --bg: #0f1117;
+    --panel: rgba(24, 26, 34, 0.88);
+    --panel-strong: rgba(31, 34, 44, 0.94);
+    --text: #f6efe2;
+    --muted: #cdbfaa;
+    --line: rgba(246, 239, 226, 0.17);
+    --gold: #d9b86f;
+    --gold-strong: #f1cf7a;
+    --gold-deep: #9c6f2f;
+    --red: #d2645a;
+    --blue: #6fa5c8;
+    --green: #6bb184;
+    --sakura: #e7a8b6;
+    --shadow: rgba(0, 0, 0, 0.44);
+    --radius: 8px;
+    --control-radius: 7px;
+    --content-gap: 14px;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    min-height: 100%;
+    background: var(--bg);
+  }
+  body {
+    min-height: 100svh;
+    font-family: var(--font-jp);
+    font-weight: 500;
+    margin: 0;
+    background:
+      radial-gradient(circle at 78% 8%, rgba(246, 226, 173, 0.82) 0 2.1rem, rgba(246, 226, 173, 0.28) 2.15rem 2.35rem, transparent 2.45rem),
+      radial-gradient(circle at 82% 9%, rgba(15, 17, 23, 0.96) 0 1.65rem, transparent 1.72rem),
+      linear-gradient(180deg, rgba(10, 11, 16, 0.08), rgba(10, 11, 16, 0.8)),
+      radial-gradient(circle at 50% 0%, rgba(99, 123, 151, 0.26), transparent 25rem),
+      radial-gradient(circle at 16% 18%, rgba(231, 168, 182, 0.12), transparent 14rem),
+      linear-gradient(145deg, #0b0d15 0%, #141c25 43%, #2a171d 100%);
+    color: var(--text);
+    text-align: center;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, transparent 0 15%, rgba(241, 207, 122, 0.06) 15% 15.7%, transparent 15.7% 36%, rgba(241, 207, 122, 0.045) 36% 36.6%, transparent 36.6%),
+      radial-gradient(circle at 15% 24%, rgba(231, 168, 182, 0.18) 0 0.12rem, transparent 0.16rem),
+      radial-gradient(circle at 22% 18%, rgba(231, 168, 182, 0.14) 0 0.1rem, transparent 0.15rem),
+      radial-gradient(circle at 72% 31%, rgba(246, 239, 226, 0.13) 0 0.08rem, transparent 0.13rem),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 8px),
+      linear-gradient(0deg, rgba(0, 0, 0, 0.42), transparent 54%);
+    opacity: 0.9;
+  }
+  .screen {
+    display: none;
+    width: min(100%, 720px);
+    min-height: 100svh;
+    padding: max(26px, env(safe-area-inset-top)) 14px max(30px, env(safe-area-inset-bottom));
+    margin: auto;
+    position: relative;
+    z-index: 1;
+  }
+  .active { display: block; }
+  .screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--content-gap);
+    animation: screenEnter 0.34s ease-out both;
+  }
+  @keyframes screenEnter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+  h1, h2, h3, p {
+    margin-top: 0;
+  }
+  h1 {
+    position: relative;
+    display: inline-grid;
+    justify-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: clamp(30px, 8vw, 46px);
+    line-height: 1.14;
+    letter-spacing: 0;
+    font-weight: 900;
+    color: var(--text);
+    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.72);
+  }
+  h1::before {
+    content: "☾  桜夜の宴  ☽";
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-strong);
+    letter-spacing: 0.16em;
+    text-shadow: 0 0 14px rgba(241, 207, 122, 0.5);
+  }
+  h1::after,
+  h2::after {
+    content: "";
+    display: block;
+    width: min(64vw, 280px);
+    height: 1px;
+    margin-top: 8px;
+    background: linear-gradient(90deg, transparent, rgba(231, 168, 182, 0.6), var(--gold-strong), rgba(231, 168, 182, 0.6), transparent);
+    box-shadow: 0 0 12px rgba(241, 207, 122, 0.4);
+  }
+  h2 {
+    position: relative;
+    display: inline-grid;
+    justify-items: center;
+    margin-bottom: 8px;
+    font-size: clamp(23px, 6vw, 34px);
+    line-height: 1.22;
+    letter-spacing: 0;
+    font-weight: 800;
+  }
+  h3 {
+    margin: 20px 0 10px;
+    font-size: clamp(17px, 4.5vw, 20px);
+    line-height: 1.35;
+    font-weight: 800;
+    color: var(--gold-strong);
+  }
+  h3::before {
+    content: "◆";
+    margin-right: 0.4em;
+    color: var(--sakura);
+    font-size: 0.72em;
+    vertical-align: 0.08em;
+  }
+  p {
+    line-height: 1.7;
+    font-weight: 500;
+    font-size: clamp(15px, 4vw, 17px);
+  }
+  button, input, select {
+    width: min(100%, 420px);
+    min-height: 50px;
+    font: inherit;
+    font-size: 16px;
+    letter-spacing: 0;
+    padding: 12px 14px;
+    margin: 7px auto;
+    border-radius: var(--control-radius);
+    border: 1px solid var(--line);
+  }
+  button {
+    color: #17130d;
+    background:
+      linear-gradient(180deg, rgba(255, 247, 214, 0.95), rgba(241, 207, 122, 0.98) 38%, rgba(174, 123, 53, 0.98));
+    cursor: pointer;
+    font-weight: 800;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.36);
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      inset 0 -2px 0 rgba(80, 48, 17, 0.28);
+    transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+  }
+  button::before,
+  button::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 1px;
+    background: rgba(68, 43, 16, 0.36);
+  }
+  button::before {
+    left: 12px;
+  }
+  button::after {
+    right: 12px;
+  }
+  button:active {
+    transform: translateY(1px) scale(0.985);
+    filter: brightness(0.96);
+    box-shadow: 0 6px 16px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  }
+  @media (hover: hover) {
+    button:hover {
+      filter: brightness(1.04);
+      box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.42),
+        0 0 18px rgba(241, 207, 122, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.58),
+        inset 0 -2px 0 rgba(80, 48, 17, 0.28);
+    }
+    #actionArea button:hover,
+    #voteArea button:hover {
+      border-color: rgba(241, 207, 122, 0.58);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(0, 0, 0, 0.14)),
+        rgba(24, 29, 40, 0.94);
+    }
+  }
+  input, select {
+    color: var(--text);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.16)),
+      rgba(11, 13, 19, 0.76);
+    border-color: rgba(217, 184, 111, 0.32);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 0 0 1px rgba(0, 0, 0, 0.18);
+    text-align: center;
+    transition: border-color 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+  }
+  input:focus, select:focus, button:focus-visible {
+    outline: 2px solid rgba(241, 207, 122, 0.72);
+    outline-offset: 3px;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.08), transparent 15rem),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent),
+      var(--panel);
+    border: 1px solid rgba(217, 184, 111, 0.24);
+    border-radius: var(--radius);
+    padding: 20px 15px;
+    margin: 0;
+    box-shadow:
+      0 18px 42px var(--shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(241, 207, 122, 0.08);
+    border-radius: 5px;
+    pointer-events: none;
+  }
+  .card p:last-child,
+  .card h2:last-child,
+  .card h3:last-child {
+    margin-bottom: 0;
+  }
+  .role {
+    font-size: 32px;
+    font-weight: 900;
+    margin: 20px;
+    color: var(--gold-strong);
+  }
+  .role-card-wrap {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    margin: 16px auto;
+  }
+  .role-card {
+    width: min(70vw, 280px);
+    aspect-ratio: 2 / 3;
+    border: 2px solid rgba(241, 207, 122, 0.88);
+    border-radius: var(--radius);
+    padding: 8px;
+    margin: 12px auto 14px;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 241, 196, 0.26), transparent 9rem),
+      linear-gradient(145deg, rgba(217, 184, 111, 0.26), rgba(17, 24, 39, 0.72)),
+      #151821;
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.58),
+      0 0 34px rgba(241, 207, 122, 0.18),
+      0 0 0 1px rgba(217, 184, 111, 0.15);
+    perspective: 1000px;
+  }
+  .role-card.wolf-side {
+    border-color: var(--red);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58), 0 0 34px rgba(210, 100, 90, 0.22), 0 0 0 3px rgba(210, 100, 90, 0.14);
+  }
+  .role-card.village-side {
+    border-color: var(--blue);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.58), 0 0 34px rgba(111, 165, 200, 0.22), 0 0 0 3px rgba(111, 165, 200, 0.14);
+  }
+  .role-card button {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #111722;
+    border: 0;
+    box-shadow: none;
+    transform-style: preserve-3d;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    will-change: transform;
+  }
+  .role-card button::before,
+  .role-card button::after {
+    display: none;
+  }
+  .role-card button:not(:disabled):active {
+    transform: scale(0.98);
+  }
+  .role-card.is-flipping button {
+    animation: cardFlip 0.68s ease-in-out;
+    box-shadow: 0 0 26px rgba(241, 207, 122, 0.42);
+  }
+  .role-card button:disabled {
+    cursor: default;
+    opacity: 1;
+  }
+  .role-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    padding: 12px;
+    line-height: 1.6;
+    color: var(--gold-strong);
+    background:
+      repeating-linear-gradient(45deg, rgba(241, 207, 122, 0.08) 0 1px, transparent 1px 12px),
+      #111722;
+  }
+  .role-card.image-missing img {
+    display: none;
+  }
+  .role-card.image-missing .card-fallback {
+    display: grid;
+  }
+  .role-name {
+    min-height: 46px;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--gold-strong);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.04em;
+  }
+  .role-name.hidden {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: normal;
+  }
+  @keyframes cardFlip {
+    0% {
+      transform: rotateY(0deg) scale(1);
+    }
+    48% {
+      transform: rotateY(92deg) scale(1.02);
+    }
+    52% {
+      transform: rotateY(88deg) scale(1.02);
+    }
+    100% {
+      transform: rotateY(0deg) scale(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen.active {
+      animation: none;
+    }
+    .role-card.is-flipping button {
+      animation: none;
+    }
+    .role-card button {
+      transition: none;
+    }
+  }
+  #screen4 .card,
+  #screen8 .card,
+  #screen5 .card,
+  #screen6 .card,
+  #screen7 .card {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.1), transparent 13rem),
+      linear-gradient(180deg, rgba(217, 184, 111, 0.08), rgba(255, 255, 255, 0.025)),
+      var(--panel-strong);
+  }
+  #actionArea {
+    width: 100%;
+    max-width: 430px;
+    margin: 16px auto 0;
+  }
+  #actionArea button,
+  #voteArea button {
+    display: block;
+    color: var(--text);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(0, 0, 0, 0.18)),
+      rgba(17, 21, 30, 0.9);
+    border-color: rgba(217, 184, 111, 0.3);
+    box-shadow:
+      0 8px 16px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    text-shadow: none;
+  }
+  #actionArea button:not(:last-child),
+  #voteArea button:not(:last-child) {
+    margin-bottom: 9px;
+  }
+  #actionArea button:last-of-type,
+  #screen5 > button,
+  #screen7 > button {
+    color: #17130d;
+    background:
+      linear-gradient(180deg, rgba(255, 247, 214, 0.95), rgba(241, 207, 122, 0.98) 38%, rgba(174, 123, 53, 0.98));
+    border-color: rgba(255, 238, 182, 0.42);
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.38),
+      inset 0 1px 0 rgba(255, 255, 255, 0.58),
+      inset 0 -2px 0 rgba(80, 48, 17, 0.28);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.36);
+  }
+  #actionArea p,
+  #suspectInfo,
+  #resultArea p {
+    color: var(--muted);
+  }
+  .night-result {
+    width: 100%;
+    margin: 14px auto 16px;
+    padding: 14px 13px;
+    border: 1px solid rgba(241, 207, 122, 0.5);
+    border-radius: var(--radius);
+    color: var(--text);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.18), transparent 9rem),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.18)),
+      rgba(12, 14, 21, 0.92);
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.34),
+      0 0 26px rgba(241, 207, 122, 0.13),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    text-align: center;
+    animation: resultReveal 0.28s ease-out both;
+  }
+  .night-result-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--gold-strong);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+  .night-result-main {
+    display: block;
+    color: var(--text);
+    font-size: clamp(20px, 5.8vw, 27px);
+    font-weight: 900;
+    line-height: 1.45;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.72);
+  }
+  .night-result-note {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  @keyframes resultReveal {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  #suspectInfo {
+    border: 1px solid rgba(217, 184, 111, 0.24);
+    border-radius: var(--radius);
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  #timerDisplay {
+    min-height: 64px;
+    display: grid;
+    place-items: center;
+    margin: 10px auto 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--gold-strong);
+    font-size: clamp(30px, 10vw, 48px);
+    font-variant-numeric: tabular-nums;
+  }
+  #timerDisplay::after {
+    display: none;
+  }
+  #resultArea .card {
+    text-align: left;
+    padding: 16px 14px;
+    margin-bottom: 12px;
+  }
+  #resultArea .card h2,
+  #resultArea .card h3 {
+    text-align: center;
+  }
+  #resultArea p {
+    margin: 0;
+    padding: 10px 4px;
+    border-top: 1px solid rgba(246, 239, 226, 0.1);
+    display: grid;
+    gap: 3px;
+  }
+  #resultArea p:first-of-type {
+    border-top: 0;
+  }
+  #resultArea b {
+    color: var(--gold-strong);
+  }
+  #roleArea {
+    border-top: 1px solid rgba(246, 239, 226, 0.11);
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+  #screen4 .card > p {
+    display: inline-block;
+    margin-bottom: 6px;
+    padding: 6px 12px;
+    border: 1px solid rgba(217, 184, 111, 0.18);
+    border-radius: 999px;
+    color: var(--muted);
+    background: rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+  }
+  .handoff-card {
+    min-height: min(72svh, 560px);
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 14px;
+  }
+  .handoff-card::after {
+    content: "";
+    width: min(46vw, 180px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-strong), transparent);
+    box-shadow: 0 0 16px rgba(241, 207, 122, 0.42);
+  }
+  .handoff-mark {
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(241, 207, 122, 0.48);
+    border-radius: 50%;
+    color: var(--gold-strong);
+    background:
+      radial-gradient(circle, rgba(241, 207, 122, 0.18), transparent 62%),
+      rgba(0, 0, 0, 0.22);
+    box-shadow: 0 0 30px rgba(241, 207, 122, 0.17);
+    font-size: 28px;
+  }
+  .handoff-card p {
+    max-width: 26rem;
+    margin-bottom: 0;
+    color: var(--muted);
+  }
+  .menu-hero {
+    min-height: min(78svh, 620px);
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .menu-logo {
+    width: min(28vw, 118px);
+    aspect-ratio: 2 / 3;
+    padding: 5px;
+    border: 1px solid rgba(241, 207, 122, 0.64);
+    border-radius: var(--radius);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.18), transparent 7rem),
+      rgba(8, 10, 16, 0.62);
+    box-shadow:
+      0 18px 36px rgba(0, 0, 0, 0.5),
+      0 0 28px rgba(241, 207, 122, 0.16);
+  }
+  .menu-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .menu-actions {
+    display: grid;
+    justify-items: center;
+    width: min(100%, 420px);
+    gap: 2px;
+    margin-top: 6px;
+  }
+  .menu-actions button:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+    filter: grayscale(0.35);
+  }
+  .menu-actions .quick-start {
+    color: var(--text);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(0, 0, 0, 0.16)),
+      rgba(24, 29, 40, 0.92);
+    border-color: rgba(241, 207, 122, 0.42);
+    text-shadow: none;
+  }
+  .menu-copy {
+    max-width: 28rem;
+    margin-bottom: 0;
+    color: var(--muted);
+  }
+  .info-card {
+    text-align: left;
+  }
+  .info-card h3 {
+    text-align: center;
+  }
+  .info-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .info-list li {
+    padding: 12px;
+    border: 1px solid rgba(217, 184, 111, 0.18);
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .info-list strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--gold-strong);
+    font-weight: 900;
+  }
+  #voteArea {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+  }
+  #resultArea {
+    width: 100%;
+  }
+  #screen7 {
+    transition: background 0.28s ease;
+  }
+  #screen7.village-result {
+    background:
+      radial-gradient(circle at 50% 6%, rgba(255, 232, 170, 0.28), transparent 17rem),
+      linear-gradient(180deg, rgba(255, 190, 119, 0.12), rgba(14, 23, 32, 0));
+  }
+  #screen7.wolf-result {
+    background:
+      radial-gradient(circle at 74% 7%, rgba(178, 42, 47, 0.38) 0 2.6rem, rgba(178, 42, 47, 0.12) 2.7rem 3.4rem, transparent 3.5rem),
+      radial-gradient(circle at 50% 6%, rgba(117, 26, 35, 0.22), transparent 17rem),
+      linear-gradient(180deg, rgba(73, 15, 24, 0.32), rgba(10, 10, 14, 0));
+  }
+  .winner-card {
+    text-align: center;
+    overflow: hidden;
+    min-height: 190px;
+    display: grid;
+    align-content: center;
+    gap: 8px;
+  }
+  .winner-card::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+  }
+  .winner-card::after {
+    content: "";
+    position: absolute;
+    inset: -46% -16% auto;
+    height: 190px;
+    pointer-events: none;
+  }
+  .winner-label {
+    position: relative;
+    z-index: 1;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+  .winner-card h2 {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    margin-bottom: 0;
+    font-size: clamp(32px, 9vw, 48px);
+    line-height: 1.16;
+    text-shadow: 0 4px 22px rgba(0, 0, 0, 0.72);
+  }
+  .winner-card h2::after {
+    width: min(54vw, 220px);
+    margin: 12px auto 0;
+  }
+  .winner-card p {
+    position: relative;
+    z-index: 1;
+    border-top: 0;
+    padding: 0;
+    color: var(--text);
+    font-size: 16px;
+    justify-items: center;
+  }
+  .winner-card.village-win {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 230, 160, 0.34), transparent 12rem),
+      linear-gradient(180deg, rgba(255, 184, 112, 0.16), rgba(90, 140, 160, 0.08)),
+      var(--panel-strong);
+    border-color: rgba(255, 216, 143, 0.68);
+    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.46), 0 0 42px rgba(255, 196, 105, 0.2);
+  }
+  .winner-card.village-win::after {
+    background: radial-gradient(circle, rgba(255, 226, 160, 0.36), transparent 66%);
+  }
+  .winner-card.wolf-win {
+    background:
+      radial-gradient(circle at 52% 0%, rgba(204, 56, 61, 0.32), transparent 12rem),
+      linear-gradient(180deg, rgba(110, 24, 32, 0.24), rgba(0, 0, 0, 0.12)),
+      var(--panel-strong);
+    border-color: rgba(210, 100, 90, 0.72);
+    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.5), 0 0 42px rgba(210, 100, 90, 0.22);
+  }
+  .winner-card.wolf-win::after {
+    background: radial-gradient(circle, rgba(210, 58, 62, 0.34), transparent 66%);
+  }
+  .result-table {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid rgba(217, 184, 111, 0.18);
+    border-radius: var(--radius);
+    background: rgba(217, 184, 111, 0.12);
+  }
+  .result-row {
+    display: grid;
+    grid-template-columns: minmax(7.5em, 0.9fr) minmax(0, 1.25fr);
+    gap: 10px;
+    align-items: center;
+    padding: 11px 12px;
+    background: rgba(10, 12, 18, 0.56);
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .result-row strong {
+    color: var(--text);
+    font-weight: 800;
+  }
+  .result-row span {
+    min-width: 0;
+  }
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 4px 9px;
+    border: 1px solid rgba(217, 184, 111, 0.2);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.055);
+    color: var(--text);
+    font-weight: 800;
+  }
+  .role-badge.village-side {
+    border-color: rgba(111, 165, 200, 0.4);
+    color: #d8efff;
+  }
+  .role-badge.wolf-side {
+    border-color: rgba(210, 100, 90, 0.48);
+    color: #ffd5cf;
+  }
+  .role-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .result-arrow {
+    color: var(--gold-strong);
+  }
+  .vote-arrow {
+    color: var(--gold-strong);
+    font-weight: 900;
+  }
+  .log-row {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .log-row span {
+    display: block;
+    color: var(--muted);
+  }
+  .log-row span + span {
+    margin-top: 4px;
+  }
+  .danger { color: #ff9b92; }
+  .good { color: #9ee8b6; }
+  .small {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  @media (max-width: 520px) {
+    .screen {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    .card {
+      padding: 16px 12px;
+    }
+    button, input, select {
+      width: 100%;
+      min-height: 50px;
+      margin: 7px 0;
+    }
+    .role-card {
+      width: min(72vw, calc(56svh * 2 / 3), 270px);
+    }
+    .result-row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      padding: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="screen0" class="screen active">
+  <div class="card menu-hero">
+    <div class="menu-logo">
+      <img src="images/back.png" alt="カード裏面">
+    </div>
+    <h1>ワンナイト人狼</h1>
+    <p class="menu-copy">宵街に集い、ひと夜だけの正体探しを始めます。</p>
+    <div class="menu-actions">
+      <button onclick="prepareNewGame()">ゲーム開始</button>
+      <button id="quickStartButton" class="quick-start" onclick="startLastGame()" hidden>前回の設定で遊ぶ</button>
+      <button onclick="show('screenRules')">ルール説明</button>
+      <button onclick="show('screenRoles')">役職説明</button>
+    </div>
+  </div>
+</div>
+
+<div id="screenRules" class="screen">
+  <h2>ルール説明</h2>
+  <div class="card info-card">
+    <ul class="info-list">
+      <li><strong>基本ルール</strong>各プレイヤーに1枚ずつ役職カードを配り、残り2枚は中央カードになります。夜行動のあと、全員で話し合います。</li>
+      <li><strong>投票</strong>議論後、自分以外の1人に投票します。最多得票者を追放し、同票最多なら該当者全員を追放します。</li>
+      <li><strong>平和村</strong>全員に1票ずつ入った場合は誰も追放されず、平和村になります。</li>
+      <li><strong>勝敗条件</strong>最終的に人狼が全員追放されれば村人陣営の勝利。人狼が1人でも残れば人狼陣営の勝利です。平和村では、最終的に人狼がいなければ村人陣営、人狼がいれば人狼陣営の勝利です。</li>
+    </ul>
+  </div>
+  <button onclick="show('screen0')">戻る</button>
+</div>
+
+<div id="screenRoles" class="screen">
+  <h2>役職説明</h2>
+  <div class="card info-card">
+    <ul class="info-list">
+      <li><strong>村人</strong>夜行動はありません。人狼を追放できれば村人陣営の勝利です。</li>
+      <li><strong>人狼</strong>仲間の人狼を確認します。最終的に人狼が残れば人狼陣営の勝利です。</li>
+      <li><strong>狂人</strong>夜行動はありません。人狼陣営として勝利を目指します。</li>
+      <li><strong>占い師</strong>プレイヤー1人の役職を見る、または中央カード2枚を見ることができます。村人陣営です。</li>
+      <li><strong>怪盗</strong>他プレイヤー1人と役職を交換します。交換後の役職で勝敗判定されます。</li>
+    </ul>
+  </div>
+  <button onclick="show('screen0')">戻る</button>
+</div>
+
+<div id="screen1" class="screen">
+  <h1>ワンナイト人狼</h1>
+  <div class="card">
+    <h2>プレイヤー人数</h2>
+    <input id="playerCount" type="number" min="4" value="4">
+    <br>
+    <button onclick="setPlayers()">次へ</button>
+  </div>
+</div>
+
+<div id="screen2" class="screen">
+  <h2>プレイヤー名</h2>
+  <div id="nameInputs"></div>
+  <button onclick="setNames()">次へ</button>
+</div>
+
+<div id="screen3" class="screen">
+  <h2>役職枚数</h2>
+  <p class="small">合計は「人数 + 2枚」にしてください。人狼は最低1枚必要です。</p>
+  <div class="card">
+    村人 <input id="roleVillager" type="number" min="0" value="2"><br>
+    人狼 <input id="roleWerewolf" type="number" min="1" value="1"><br>
+    狂人 <input id="roleMadman" type="number" min="0" value="1"><br>
+    占い師 <input id="roleSeer" type="number" min="0" value="1"><br>
+    怪盗 <input id="roleRobber" type="number" min="0" value="1"><br>
+  </div>
+  <button onclick="startGame()">ゲーム開始</button>
+</div>
+
+<div id="screen8" class="screen">
+  <div class="card handoff-card">
+    <div class="handoff-mark">☾</div>
+    <h2 id="handoffTitle">次のプレイヤーへ</h2>
+    <p id="handoffText">次の人にスマホを渡してください。準備ができたら進みます。</p>
+    <button onclick="continueFromHandoff()">役職確認へ</button>
+  </div>
+</div>
+
+<div id="screen4" class="screen">
+  <h2 id="turnTitle"></h2>
+  <div class="card">
+    <p>本人だけが見てください</p>
+    <div id="roleCard" class="role-card">
+      <button id="roleCardButton" onclick="revealRole()" aria-label="役職カードを見る">
+        <img id="roleImage" src="images/back.png" alt="カード裏面">
+        <span id="cardFallback" class="card-fallback">カード裏面</span>
+      </button>
+    </div>
+    <div id="roleName" class="role-name hidden">カードをタップして役職を見る</div>
+    <div id="roleArea" style="display:none;">
+      <div id="actionArea"></div>
+    </div>
+  </div>
+</div>
+
+<div id="screen5" class="screen">
+  <h2>議論フェーズ</h2>
+  <div class="card">
+    <p id="suspectInfo"></p>
+    <h2 id="timerDisplay">タイマーなし</h2>
+    <select id="discussionTime">
+      <option value="0">タイマーなし</option>
+      <option value="60">1分</option>
+      <option value="180">3分</option>
+      <option value="300">5分</option>
+    </select>
+    <br>
+    <button onclick="startDiscussion()">議論スタート</button>
+  </div>
+  <button onclick="startVoting()">投票へ</button>
+</div>
+
+<div id="screen6" class="screen">
+  <h2 id="voteTitle"></h2>
+  <div class="card" id="voteArea"></div>
+</div>
+
+<div id="screen7" class="screen">
+  <h2>結果発表</h2>
+  <div id="resultArea"></div>
+  <button onclick="location.reload()">最初から</button>
+</div>
+
+<script>
+let players = [];
+let centerCards = [];
+let currentIndex = 0;
+let actions = {};
+let votes = {};
+let initialRoles = {};
+let finalRoles = {};
+let timer = null;
+const SETTINGS_KEY = "oneNightWerewolfLastSettings";
+
+const roleImages = {
+  "村人": "images/villager.png",
+  "人狼": "images/werewolf.png",
+  "狂人": "images/madman.png",
+  "占い師": "images/seer.png",
+  "怪盗": "images/thief.png"
+};
+
+function roleSide(role) {
+  return role === "人狼" || role === "狂人" ? "wolf-side" : "village-side";
+}
+
+function loadSavedSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function escapeAttr(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function getRoleSettings() {
+  return {
+    villager: Number(roleVillager.value),
+    werewolf: Number(roleWerewolf.value),
+    madman: Number(roleMadman.value),
+    seer: Number(roleSeer.value),
+    robber: Number(roleRobber.value)
+  };
+}
+
+function applySavedSettings(settings, includeNames = false) {
+  if (!settings) return;
+  if (settings.playerCount) document.getElementById("playerCount").value = settings.playerCount;
+  if (settings.roles) {
+    roleVillager.value = settings.roles.villager ?? roleVillager.value;
+    roleWerewolf.value = settings.roles.werewolf ?? roleWerewolf.value;
+    roleMadman.value = settings.roles.madman ?? roleMadman.value;
+    roleSeer.value = settings.roles.seer ?? roleSeer.value;
+    roleRobber.value = settings.roles.robber ?? roleRobber.value;
+  }
+  if (settings.discussionTime !== undefined) {
+    document.getElementById("discussionTime").value = settings.discussionTime;
+  }
+  if (includeNames && Array.isArray(settings.playerNames)) {
+    settings.playerNames.forEach((name, index) => {
+      const input = document.getElementById("name" + index);
+      if (input) input.value = name;
+    });
+  }
+}
+
+function saveCurrentSettings() {
+  const playerNames = players.length
+    ? players.map(p => p.name)
+    : Array.from({ length: Number(document.getElementById("playerCount").value) }, (_, index) => {
+      const input = document.getElementById("name" + index);
+      return input ? input.value : `プレイヤー${index + 1}`;
+    });
+
+  const settings = {
+    playerCount: Number(document.getElementById("playerCount").value),
+    playerNames,
+    roles: getRoleSettings(),
+    discussionTime: document.getElementById("discussionTime").value
+  };
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (error) {
+    return;
+  }
+  updateQuickStartButton();
+}
+
+function updateQuickStartButton() {
+  const button = document.getElementById("quickStartButton");
+  if (!button) return;
+  const settings = loadSavedSettings();
+  const hasSettings = !!(settings && settings.playerCount && Array.isArray(settings.playerNames) && settings.roles);
+  button.hidden = !hasSettings;
+  button.disabled = !hasSettings;
+}
+
+function prepareNewGame() {
+  const settings = loadSavedSettings();
+  applySavedSettings(settings);
+  show("screen1");
+}
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const next = document.getElementById(id);
+  next.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showHandoff() {
+  const nextPlayer = players[currentIndex];
+  document.getElementById("handoffTitle").textContent = `${nextPlayer.name}さんへ`;
+  document.getElementById("handoffText").textContent = "次の人にスマホを渡してください。準備ができたら進みます。";
+  show("screen8");
+}
+
+function continueFromHandoff() {
+  showPlayerTurn();
+  show("screen4");
+}
+
+function setPlayers() {
+  const count = Number(document.getElementById("playerCount").value);
+  if (count < 4) {
+    alert("4人以上にしてください");
+    return;
+  }
+
+  const settings = loadSavedSettings();
+  const savedNames = Array.isArray(settings?.playerNames) ? settings.playerNames : [];
+  const box = document.getElementById("nameInputs");
+  box.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    box.innerHTML += `<input id="name${i}" value="${escapeAttr(savedNames[i] || `プレイヤー${i + 1}`)}"><br>`;
+  }
+  show("screen2");
+}
+
+function setNames() {
+  const count = Number(document.getElementById("playerCount").value);
+  players = [];
+  for (let i = 0; i < count; i++) {
+    players.push({
+      name: document.getElementById("name" + i).value || `プレイヤー${i + 1}`,
+      role: "",
+      finalRole: ""
+    });
+  }
+  show("screen3");
+}
+
+function startLastGame() {
+  const settings = loadSavedSettings();
+  if (!settings) return;
+
+  applySavedSettings(settings);
+  players = (settings.playerNames || []).slice(0, settings.playerCount).map((name, index) => ({
+    name: name || `プレイヤー${index + 1}`,
+    role: "",
+    finalRole: ""
+  }));
+
+  if (players.length < 4) {
+    alert("保存されたプレイヤー人数が不足しています");
+    return;
+  }
+
+  startGame();
+}
+
+function startGame() {
+  const roles = [];
+  addRoles(roles, "村人", Number(roleVillager.value));
+  addRoles(roles, "人狼", Number(roleWerewolf.value));
+  addRoles(roles, "狂人", Number(roleMadman.value));
+  addRoles(roles, "占い師", Number(roleSeer.value));
+  addRoles(roles, "怪盗", Number(roleRobber.value));
+
+  const need = players.length + 2;
+
+  if (Number(roleWerewolf.value) < 1) {
+    alert("人狼は最低1枚必要です");
+    return;
+  }
+
+  if (roles.length !== need) {
+    alert(`カードは合計${need}枚必要です。現在${roles.length}枚です。`);
+    return;
+  }
+
+  saveCurrentSettings();
+  shuffle(roles);
+
+  players.forEach((p, i) => {
+    p.role = roles[i];
+    p.finalRole = roles[i];
+    initialRoles[p.name] = roles[i];
+    finalRoles[p.name] = roles[i];
+  });
+
+  centerCards = [roles[players.length], roles[players.length + 1]];
+
+  currentIndex = 0;
+  document.getElementById("screen7").classList.remove("village-result", "wolf-result");
+  showPlayerTurn();
+  show("screen4");
+}
+
+function addRoles(arr, role, count) {
+  for (let i = 0; i < count; i++) arr.push(role);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function showPlayerTurn() {
+  document.getElementById("turnTitle").textContent = `${players[currentIndex].name}さんの番`;
+  document.getElementById("roleArea").style.display = "none";
+  document.getElementById("actionArea").innerHTML = "";
+  document.getElementById("roleCard").className = "role-card";
+  document.getElementById("roleCardButton").disabled = false;
+  document.getElementById("roleImage").src = "images/back.png";
+  document.getElementById("roleImage").alt = "カード裏面";
+  document.getElementById("cardFallback").textContent = "カード裏面";
+  document.getElementById("roleName").textContent = "カードをタップして役職を見る";
+  document.getElementById("roleName").className = "role-name hidden";
+}
+
+function revealRole() {
+  const p = players[currentIndex];
+  const card = document.getElementById("roleCard");
+  const button = document.getElementById("roleCardButton");
+  if (button.disabled) return;
+
+  button.disabled = true;
+  card.className = "role-card is-flipping";
+
+  setTimeout(() => {
+    card.className = `role-card is-flipping ${roleSide(p.role)}`;
+    document.getElementById("roleImage").src = roleImages[p.role];
+    document.getElementById("roleImage").alt = p.role;
+    document.getElementById("cardFallback").textContent = p.role;
+  }, 300);
+
+  setTimeout(() => {
+    const imageMissing = card.classList.contains("image-missing");
+    card.className = `role-card ${roleSide(p.role)}${imageMissing ? " image-missing" : ""}`;
+    document.getElementById("roleName").textContent = p.role;
+    document.getElementById("roleName").className = "role-name";
+    document.getElementById("roleArea").style.display = "block";
+    buildAction(p);
+  }, 680);
+}
+
+function buildAction(p) {
+  let html = "";
+
+  if (p.role === "人狼") {
+    const wolves = players.filter(x => x.role === "人狼" && x.name !== p.name).map(x => x.name);
+    html += `<div class="night-result"><span class="night-result-label">人狼の確認結果</span><span class="night-result-main">仲間：${wolves.length ? wolves.join("、") : "なし"}</span></div>`;
+  }
+
+  if (p.role === "占い師") {
+    html += `<h3>占い先を選択</h3>`;
+    html += `<button onclick="seerCenter()">中央2枚を見る</button><br>`;
+    players.forEach(x => {
+      if (x.name !== p.name) {
+        html += `<button onclick="seerPlayer('${x.name}')">${x.name}を見る</button>`;
+      }
+    });
+    html += `<div id="seerResult" aria-live="polite"></div>`;
+  }
+
+  if (p.role === "怪盗") {
+    html += `<h3>交換相手を選択</h3>`;
+    players.forEach(x => {
+      if (x.name !== p.name) {
+        html += `<button onclick="robPlayer('${x.name}')">${x.name}と交換</button>`;
+      }
+    });
+    html += `<div id="robResult" aria-live="polite"></div>`;
+  }
+
+  html += `<h3>疑っている人</h3>`;
+  players.forEach(x => {
+    if (x.name !== p.name) {
+      html += `<button onclick="setSuspect('${x.name}')">${x.name}</button>`;
+    }
+  });
+
+  html += `<p id="suspectResult"></p>`;
+  html += `<br><button onclick="nextPlayer()">確認終了</button>`;
+
+  document.getElementById("actionArea").innerHTML = html;
+}
+
+function showNightResult(id, label, main, note = "") {
+  const result = document.getElementById(id);
+  result.innerHTML =
+    `<div class="night-result"><span class="night-result-label">${label}</span><span class="night-result-main">${main}</span>${note ? `<span class="night-result-note">${note}</span>` : ""}</div>`;
+  result.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function seerCenter() {
+  const p = players[currentIndex];
+  actions[p.name] = actions[p.name] || {};
+
+  if (actions[p.name].seer) {
+    alert("占い行動はすでに決定済みです");
+    return;
+  }
+
+  actions[p.name].seer = `中央カード：${centerCards[0]} / ${centerCards[1]}`;
+
+  showNightResult("seerResult", "占い結果", `${centerCards[0]} / ${centerCards[1]}`, "中央カード2枚");
+}
+
+function seerPlayer(name) {
+  const p = players[currentIndex];
+  actions[p.name] = actions[p.name] || {};
+
+  if (actions[p.name].seer) {
+    alert("占い行動はすでに決定済みです");
+    return;
+  }
+
+  const target = players.find(player => player.name === name);
+
+  actions[p.name].seer = `${name}：${target.role}`;
+
+  showNightResult("seerResult", "占い結果", target.role, `${name} の役職`);
+}
+
+function robPlayer(name) {
+  const robber = players[currentIndex];
+  actions[robber.name] = actions[robber.name] || {};
+
+  if (actions[robber.name].rob) {
+    alert("怪盗行動はすでに決定済みです");
+    return;
+  }
+
+  const target = players.find(player => player.name === name);
+
+  const targetOldRole = target.finalRole;
+
+  actions[robber.name].rob =
+    `${target.name}と交換。新役職：${targetOldRole}`;
+
+  const old = robber.finalRole;
+  robber.finalRole = target.finalRole;
+  target.finalRole = old;
+
+  finalRoles[robber.name] = robber.finalRole;
+  finalRoles[target.name] = target.finalRole;
+
+  showNightResult("robResult", "交換結果", robber.finalRole, `${target.name}と交換しました。あなたの新しい役職です。`);
+}
+
+function setSuspect(name) {
+  const p = players[currentIndex];
+  actions[p.name] = actions[p.name] || {};
+  if (actions[p.name].suspect) {
+    alert("疑っている人はすでに決定済みです");
+    return;
+  }
+  actions[p.name].suspect = name;
+
+  document.getElementById("suspectResult").textContent =
+    `${name}を疑っています`;
+}
+
+function nextPlayer() {
+  const p = players[currentIndex];
+  if (p.role === "怪盗" && (!actions[p.name] || !actions[p.name].rob)) {
+    alert("怪盗は交換相手を選んでください");
+    return;
+  }
+
+  if (!actions[p.name] || !actions[p.name].suspect) {
+    alert("疑っている人を選んでください");
+    return;
+  }
+
+  currentIndex++;
+  if (currentIndex >= players.length) {
+    showDiscussion();
+  } else {
+    showHandoff();
+  }
+}
+
+function showDiscussion() {
+  const counts = {};
+  players.forEach(p => {
+    const s = actions[p.name]?.suspect;
+    if (s) counts[s] = (counts[s] || 0) + 1;
+  });
+
+  let max = 0;
+  let names = [];
+  Object.keys(counts).forEach(name => {
+    if (counts[name] > max) {
+      max = counts[name];
+      names = [name];
+    } else if (counts[name] === max) {
+      names.push(name);
+    }
+  });
+
+  document.getElementById("suspectInfo").textContent =
+    names.length ? `夜時点で疑われている人：${names.join("、")}（${max}票）` : "疑い情報なし";
+
+  show("screen5");
+}
+
+function startDiscussion() {
+  clearInterval(timer);
+  saveCurrentSettings();
+  let time = Number(document.getElementById("discussionTime").value);
+
+  if (time === 0) {
+    document.getElementById("timerDisplay").textContent = "タイマーなし";
+    return;
+  }
+
+  timer = setInterval(() => {
+    const min = Math.floor(time / 60);
+    const sec = time % 60;
+    document.getElementById("timerDisplay").textContent = `${min}:${String(sec).padStart(2, "0")}`;
+    time--;
+
+    if (time < 0) {
+      clearInterval(timer);
+      document.getElementById("timerDisplay").textContent = "時間です";
+    }
+  }, 1000);
+}
+
+function startVoting() {
+  currentIndex = 0;
+  votes = {};
+  showVoteTurn();
+  show("screen6");
+}
+
+function showVoteTurn() {
+  const p = players[currentIndex];
+  document.getElementById("voteTitle").textContent = `${p.name}さんの投票`;
+
+  let html = "";
+  players.forEach(x => {
+    if (x.name !== p.name) {
+      html += `<button onclick="vote('${x.name}')">${x.name}</button>`;
+    }
+  });
+
+  document.getElementById("voteArea").innerHTML = html;
+}
+
+function vote(name) {
+  votes[players[currentIndex].name] = name;
+  currentIndex++;
+
+  if (currentIndex >= players.length) {
+    showResult();
+  } else {
+    showVoteTurn();
+  }
+}
+
+function showResult() {
+  const voteCounts = {};
+  Object.values(votes).forEach(v => {
+    voteCounts[v] = (voteCounts[v] || 0) + 1;
+  });
+
+  const allOneVote =
+    Object.values(voteCounts).every(v => v === 1) &&
+    Object.keys(voteCounts).length === players.length;
+
+  let exiled = [];
+
+  if (!allOneVote) {
+    const max = Math.max(...Object.values(voteCounts));
+    exiled = Object.keys(voteCounts).filter(name => voteCounts[name] === max);
+  }
+
+  const finalWolves = players.filter(p => p.finalRole === "人狼").map(p => p.name);
+
+  let winner = "";
+
+  if (allOneVote) {
+    winner = finalWolves.length === 0 ? "村人陣営の勝利" : "人狼陣営の勝利";
+  } else {
+    const allWolvesExiled =
+      finalWolves.length > 0 &&
+      finalWolves.every(w => exiled.includes(w));
+
+    winner = allWolvesExiled ? "村人陣営の勝利" : "人狼陣営の勝利";
+  }
+
+  const winnerClass = winner.includes("村人") ? "village-win" : "wolf-win";
+  const resultScreen = document.getElementById("screen7");
+  resultScreen.classList.remove("village-result", "wolf-result");
+  resultScreen.classList.add(winner.includes("村人") ? "village-result" : "wolf-result");
+
+  let html = `<div class="card winner-card ${winnerClass}"><div class="winner-label">勝利陣営</div><h2 class="${winner.includes("村人") ? "good" : "danger"}">${winner}</h2>`;
+
+  if (allOneVote) {
+    html += `<p>全員に1票ずつ入ったため、平和村判定です。</p>`;
+  } else {
+    html += `<p>追放：${exiled.join("、")}</p>`;
+  }
+
+  html += `</div>`;
+
+  html += `<div class="card"><h3>最終役職一覧</h3><div class="result-table">`;
+  players.forEach(p => {
+    html += `<div class="result-row"><strong>${p.name}</strong><span class="role-flow"><span class="role-badge ${roleSide(p.role)}">${p.role}</span><span class="result-arrow">→</span><span class="role-badge ${roleSide(p.finalRole)}">最終 ${p.finalRole}</span></span></div>`;
+  });
+
+  html += `<div class="result-row"><strong>中央カード</strong><span class="role-flow"><span class="role-badge ${roleSide(centerCards[0])}">${centerCards[0]}</span><span class="role-badge ${roleSide(centerCards[1])}">${centerCards[1]}</span></span></div></div></div>`;
+
+  html += `<div class="card"><h3>夜行動ログ</h3><div class="result-table">`;
+  players.forEach(p => {
+    const a = actions[p.name] || {};
+    let log = "";
+    if (a.seer) log += `<span>占い：${a.seer}</span>`;
+    if (a.rob) log += `<span>怪盗：${a.rob}</span>`;
+    log += `<span>疑い先：${a.suspect || "なし"}</span>`;
+    html += `<div class="result-row log-row"><strong>${p.name}</strong>${log}</div>`;
+  });
+
+  html += `</div></div>`;
+
+  html += `<div class="card"><h3>投票結果</h3><div class="result-table">`;
+  Object.keys(votes).forEach(name => {
+    html += `<div class="result-row"><strong>${name}</strong><span><span class="vote-arrow">→</span> ${votes[name]}</span></div>`;
+  });
+
+  html += `</div></div>`;
+
+document.getElementById("resultArea").innerHTML = html;
+  show("screen7");
+}
+
+document.getElementById("roleImage").addEventListener("error", () => {
+  document.getElementById("roleCard").classList.add("image-missing");
+  document.getElementById("roleImage").removeAttribute("src");
+});
+
+document.getElementById("discussionTime").addEventListener("change", () => {
+  if (players.length) saveCurrentSettings();
+});
+
+updateQuickStartButton();
+</script>
+
+</body>
+</html>
