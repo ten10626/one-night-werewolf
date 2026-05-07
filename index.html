@@ -417,6 +417,7 @@
   #screen8 .card,
   #screen5 .card,
   #screen6 .card,
+  #screen9 .card,
   #screen7 .card {
     background:
       radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.1), transparent 13rem),
@@ -447,6 +448,7 @@
   }
   #actionArea button:last-of-type,
   #screen5 > button,
+  #screen9 button,
   #screen7 > button {
     color: #17130d;
     background:
@@ -604,6 +606,20 @@
     max-width: 26rem;
     margin-bottom: 0;
     color: var(--muted);
+  }
+  .completion-title {
+    max-width: 18rem;
+    margin-bottom: 0;
+    line-height: 1.45;
+  }
+  .completion-title span,
+  .completion-copy span {
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .completion-copy {
+    max-width: 20rem;
+    line-height: 1.9;
   }
   .menu-hero {
     min-height: min(78svh, 620px);
@@ -1007,6 +1023,15 @@
 <div id="screen6" class="screen">
   <h2 id="voteTitle"></h2>
   <div class="card" id="voteArea"></div>
+</div>
+
+<div id="screen9" class="screen">
+  <div class="card handoff-card">
+    <div class="handoff-mark">☾</div>
+    <h2 class="completion-title"><span>全員の投票が</span><br><span>完了しました</span></h2>
+    <p class="completion-copy"><span>準備ができたら、</span><br><span>結果を確認してください。</span></p>
+    <button onclick="showResult()">結果を見る</button>
+  </div>
 </div>
 
 <div id="screen7" class="screen">
@@ -1498,7 +1523,7 @@ function vote(name) {
   currentIndex++;
 
   if (currentIndex >= players.length) {
-    showResult();
+    show("screen9");
   } else {
     showVoteTurn();
   }
