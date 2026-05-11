@@ -545,34 +545,21 @@
       linear-gradient(180deg, rgba(217, 184, 111, 0.1), rgba(255, 255, 255, 0.025)),
       var(--panel-strong);
   }
-  .discussion-kicker {
-    display: inline-grid;
-    grid-auto-flow: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    color: var(--gold-strong);
-    font-size: 13px;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-shadow: 0 0 12px rgba(241, 207, 122, 0.26);
+  .suspect-label,
+  .suspect-names {
+    display: block;
   }
-  .discussion-kicker::before,
-  .discussion-kicker::after {
-    content: "";
-    width: 18px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(241, 207, 122, 0.7));
-  }
-  .discussion-kicker::after {
-    background: linear-gradient(90deg, rgba(241, 207, 122, 0.7), transparent);
-  }
-  .discussion-copy {
-    max-width: 26rem;
-    margin: 0 auto 14px;
+  .suspect-label {
+    margin-bottom: 6px;
     color: var(--muted);
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .suspect-names {
+    color: var(--gold-strong);
+    font-size: clamp(19px, 5vw, 24px);
+    font-weight: 900;
+    line-height: 1.45;
   }
   .timer-panel {
     display: grid;
@@ -1265,8 +1252,6 @@
 <div id="screen5" class="screen">
   <h2>議論フェーズ</h2>
   <div class="card discussion-card">
-    <div class="discussion-kicker">夜明け前の評定</div>
-    <p class="discussion-copy">月明かりの下、言葉を交わし、宴に紛れた影を探してください。</p>
     <p id="suspectInfo"></p>
     <div class="timer-panel">
       <span class="timer-label">議論時間</span>
@@ -1734,8 +1719,9 @@ function showDiscussion() {
     }
   });
 
-  document.getElementById("suspectInfo").textContent =
-    names.length ? `夜時点で疑われている人：${names.join("、")}（${max}票）` : "疑い情報なし";
+  document.getElementById("suspectInfo").innerHTML = names.length
+    ? `<span class="suspect-label">夜時点で疑われている人</span><span class="suspect-names">${escapeAttr(names.join("、"))}（${max}票）</span>`
+    : `<span class="suspect-label">夜時点で疑われている人</span><span class="suspect-names">なし</span>`;
 
   show("screen5");
 }
