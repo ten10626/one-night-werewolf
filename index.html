@@ -744,6 +744,64 @@
     color: var(--gold-strong);
     font-weight: 900;
   }
+  .role-guide {
+    display: grid;
+    grid-template-columns: clamp(74px, 22vw, 96px) 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+  }
+  .role-guide-card {
+    aspect-ratio: 2 / 3;
+    padding: 4px;
+    border: 1px solid rgba(241, 207, 122, 0.42);
+    border-radius: var(--radius);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(241, 207, 122, 0.14), transparent 5rem),
+      rgba(8, 10, 16, 0.72);
+    box-shadow:
+      0 10px 20px rgba(0, 0, 0, 0.34),
+      0 0 16px rgba(241, 207, 122, 0.11);
+  }
+  .role-guide-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .role-guide-text {
+    min-width: 0;
+  }
+  .role-guide-name {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--gold-strong);
+    font-size: clamp(17px, 4.7vw, 20px);
+    line-height: 1.25;
+    font-weight: 900;
+  }
+  .role-epithet {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--sakura);
+    font-size: clamp(14px, 3.8vw, 16px);
+    line-height: 1.35;
+    font-weight: 800;
+  }
+  .role-poem {
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: clamp(13px, 3.6vw, 15px);
+    line-height: 1.65;
+    font-weight: 600;
+  }
+  .role-rule {
+    margin: 0;
+    color: var(--muted);
+    font-size: clamp(13px, 3.7vw, 15px);
+    line-height: 1.7;
+  }
   #voteArea {
     display: grid;
     justify-items: center;
@@ -975,11 +1033,51 @@
   <h2>役職説明</h2>
   <div class="card info-card">
     <ul class="info-list">
-      <li><strong>村人</strong>夜行動はありません。人狼を1人でも追放できれば村人陣営の勝利です。</li>
-      <li><strong>人狼</strong>仲間の人狼を確認します。投票で人狼が追放されなければ人狼陣営の勝利です。</li>
-      <li><strong>狂人</strong>夜行動はありません。人狼陣営として勝利を目指します。</li>
-      <li><strong>占い師</strong>プレイヤー1人の役職を見る、または中央カード2枚を見ることができます。村人陣営です。</li>
-      <li><strong>怪盗</strong>他プレイヤー1人と役職を交換します。交換後の役職で勝敗判定されます。</li>
+      <li class="role-guide">
+        <div class="role-guide-card"><img src="images/villager.png" alt="村人"></div>
+        <div class="role-guide-text">
+          <strong class="role-guide-name">村人</strong>
+          <span class="role-epithet">宴の客人</span>
+          <p class="role-poem">ただ一夜の宴に招かれし、<br>何も知らぬ客人。</p>
+          <p class="role-rule">夜行動はありません。人狼を1人でも追放できれば村人陣営の勝利です。</p>
+        </div>
+      </li>
+      <li class="role-guide">
+        <div class="role-guide-card"><img src="images/werewolf.png" alt="人狼"></div>
+        <div class="role-guide-text">
+          <strong class="role-guide-name">人狼</strong>
+          <span class="role-epithet">宵に紛れる獣</span>
+          <p class="role-poem">桜影に牙を潜め、<br>静かに宴へ紛れ込む。</p>
+          <p class="role-rule">仲間の人狼を確認します。投票で人狼が追放されなければ人狼陣営の勝利です。</p>
+        </div>
+      </li>
+      <li class="role-guide">
+        <div class="role-guide-card"><img src="images/seer.png" alt="占い師"></div>
+        <div class="role-guide-text">
+          <strong class="role-guide-name">占い師</strong>
+          <span class="role-epithet">月影の語り部</span>
+          <p class="role-poem">月下に秘められし正体を、<br>静かに映し出す。</p>
+          <p class="role-rule">プレイヤー1人の役職を見る、または中央カード2枚を見ることができます。村人陣営です。</p>
+        </div>
+      </li>
+      <li class="role-guide">
+        <div class="role-guide-card"><img src="images/thief.png" alt="怪盗"></div>
+        <div class="role-guide-text">
+          <strong class="role-guide-name">怪盗</strong>
+          <span class="role-epithet">影を盗む者</span>
+          <p class="role-poem">姿も役目も盗み去り、<br>宴に混沌を招く。</p>
+          <p class="role-rule">他プレイヤー1人と役職を交換します。交換後の役職で勝敗判定されます。</p>
+        </div>
+      </li>
+      <li class="role-guide">
+        <div class="role-guide-card"><img src="images/madman.png" alt="狂人"></div>
+        <div class="role-guide-text">
+          <strong class="role-guide-name">狂人</strong>
+          <span class="role-epithet">紅月に魅入られし者</span>
+          <p class="role-poem">狂気に染まり、<br>宴を破滅へと導く。</p>
+          <p class="role-rule">夜行動はありません。人狼陣営として勝利を目指します。</p>
+        </div>
+      </li>
     </ul>
   </div>
   <button onclick="show('screen0')">戻る</button>
